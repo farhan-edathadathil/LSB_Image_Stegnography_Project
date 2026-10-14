@@ -55,6 +55,7 @@ Status do_encoding(EncodeInfo *encInfo)
 {
     open_files(encInfo);
     printf("All file opening successfull\n");
+    check_capacity(encInfo);
 
     return e_success;
 
@@ -80,5 +81,15 @@ Status open_files(EncodeInfo *encInfo)
 
 Status check_capacity(EncodeInfo *encInfo)
 {
+    unsigned char temp[4];
+    int width,height;
+
+    fseek(encInfo->fptr_src_image,18,SEEK_SET);
+    fread(temp,1,4,encInfo->fptr_src_image);
+    width = temp[0] | (temp[1]<<8) | (temp[2]<<16) | (temp[3]<<24);
+    fread(temp,1,4,encInfo->fptr_src_image);
+    height = temp[0] | (temp[1]<<8) | (temp[2]<<16) | (temp[3]<<24);
+    encInfo->image_capacity=(width * height * 3)/8;  //calculating the byte of data the image can hide 1byte data 8byte image data to hide
+
     
 }
