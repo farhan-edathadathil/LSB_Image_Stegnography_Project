@@ -31,6 +31,7 @@ Status read_and_validate_encode_args(char *argv[], EncodeInfo *encInfo)
         return e_failure;
     }
     encInfo->secret_fname=argv[3];
+    strcpy(encInfo->extn_secret_file,"txt");
     printf("Valid secret file extention \n");
     if(argv[4]!=NULL)
     {
@@ -55,7 +56,10 @@ Status do_encoding(EncodeInfo *encInfo)
 {
     open_files(encInfo);
     printf("All file opening successfull\n");
+    printf("Enter the magic string : ");
+    scanf(" %s",encInfo->magic_string);
     check_capacity(encInfo);
+    printf("Valid source file capacity \n");
 
     return e_success;
 
@@ -81,15 +85,31 @@ Status open_files(EncodeInfo *encInfo)
 
 Status check_capacity(EncodeInfo *encInfo)
 {
-    unsigned char temp[4];
-    int width,height;
+    encInfo->image_capacity= get_image_size_for_bmp(encInfo->fptr_src_image);
 
-    fseek(encInfo->fptr_src_image,18,SEEK_SET);
-    fread(temp,1,4,encInfo->fptr_src_image);
-    width = temp[0] | (temp[1]<<8) | (temp[2]<<16) | (temp[3]<<24);
-    fread(temp,1,4,encInfo->fptr_src_image);
-    height = temp[0] | (temp[1]<<8) | (temp[2]<<16) | (temp[3]<<24);
-    encInfo->image_capacity=(width * height * 3)/8;  //calculating the byte of data the image can hide 1byte data 8byte image data to hide
+    encInfo->size_secret_file= get_file_size(encInfo->fptr_secret);
+    uint encode_data_bytes=0;
+    encode_data_bytes=strlen(encInfo->magic_string)+sizeof(int)+strlen(encInfo->extn_secret_file)+sizeof(int)+encInfo->size_secret_file;
+    if(encInfo->image_capacity < (encode_data_bytes*8))
+    {
+        printf("\n%s file don't have the capacity to hold this %s file data\nTry a diffrent source file !!\n\n",encInfo->src_image_fname,encInfo->secret_fname);
+        exit(e_failure);
+    }
+    return e_success;
+}
 
-    
+uint get_image_size_for_bmp(FILE *fptr_image)
+{
+    unsigned int width,height;
+
+    fseek(fptr_image,18,SEEK_SET);
+    fread(&width,4,1,fptr_image);
+    fread(&height,4,1,fptr_image);
+    return (width * height * 3);  //calculating the byte of data the image can hide 1byte data 8byte image data to hide
+}
+
+uint get_file_size(FILE *fptr)
+{
+    fseek(fptr,0,SEEK_END);
+    return (uint)ftell(fptr);   
 }

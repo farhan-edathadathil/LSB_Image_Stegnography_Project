@@ -34,6 +34,8 @@ typedef struct _EncodeInfo
     char *stego_image_fname;
     FILE *fptr_stego_image;
 
+    //magic string
+    char magic_string[10];
 } EncodeInfo;
 
 
