@@ -85,6 +85,8 @@ Status encode_byte_to_lsb(const unsigned char data, char *image_buffer);
 /* Copy remaining image bytes from src to stego image after encoding */
 Status copy_remaining_img_data(FILE *fptr_src, FILE *fptr_dest,EncodeInfo *encInfo);
 
+void close_encfile(EncodeInfo *encInfo);
+
 void display_status(char *status,char *done);
 
 void display_error(char *error);

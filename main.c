@@ -1,42 +1,54 @@
-#include <stdio.h>
-#include "encode.h"
-#include "types.h"
+#include<stdio.h>
+#include"encode.h"
+#include"decode.h"
+#include"types.h"
+#include"common.h"
 
 int main(int argc,char **argv)
 {
     if(argc<2)
     {
-        printf("\nNot enough arguments given !!\n\n");
+        display_comerror("Not enough arguments given");
         return e_failure;
     }
     EncodeInfo encInfo;
+    DecodeInfo decInfo;
 
     if(check_operation_type(argv)==e_encode)
     {
         if(argc<4)
         {
-            printf("\nNot enough arguments given for encodeing!!\n\n");
+            display_error("Not enough arguments given for encodeing");
+            display_help();
             return e_failure;
         }
-        printf("We choosed Encoding !!\n");
+        printf("\n************************************************\n");
+        printf("        Encoding Operation Selected\n");
+        printf("************************************************\n\n");
+
         if(read_and_validate_encode_args(argv,&encInfo)!=e_success)
-        {
             return e_failure;
-        }
+
         do_encoding(&encInfo);
     }
     else if(check_operation_type(argv)==e_decode)
     {
         if(argc<3)
         {
-            printf("\nNot enough arguments given for decodeing!!\n\n");
+            display_error("Not enough arguments given for decodeing");
+            display_help();
             return e_failure;
         }
-        printf("We choosed Decoding !!\n");
+        printf("\n************************************************\n");
+        printf("        Decoding Operation Selected\n");
+        printf("************************************************\n\n");
+        if(read_and_validate_decode_args(argv,&decInfo)!=e_success)
+            return e_failure;
+        do_decoding(&decInfo);
     }
     else
     {
-        printf("\nYou have given Unsupported argument !!\nPass -e for encoding , -d for decoding\n\n");
+        display_comerror("You have given Unsupported argument");
         return e_failure;
     }
 

@@ -1,20 +1,10 @@
-#include <stdio.h>
+#include<stdio.h>
 #include<string.h>
 #include<stdlib.h>
-#include <unistd.h>
-#include "encode.h"
-#include "types.h"
+#include<unistd.h>
+#include"encode.h"
+#include"types.h"
 
-OperationType check_operation_type(char *argv[])
-{
-
-    if(strcmp(argv[1],"-e")==0)
-        return e_encode;
-    else if(strcmp(argv[1],"-d")==0)
-        return e_decode;
-    else
-        return e_unsupported;
-}
 
 Status read_and_validate_encode_args(char *argv[], EncodeInfo *encInfo)
 {
@@ -50,12 +40,17 @@ Status read_and_validate_encode_args(char *argv[], EncodeInfo *encInfo)
         extn=strrchr(argv[4],'.');
         if(extn==NULL || strcmp(extn,".bmp")!=0)
         {
-            printf("INVALID : Invalid output file extention !!\nFIX : Default output file name choosed !!\n");
+            printf("[INVALID] : Invalid output file extention !!\n%-9s : Default output file name choosed !!\n","[FIX]");
+            goto skip;
+        }
+        if(strlen(argv[4])==strlen(extn))
+        {
+            printf("[INVALID] : No file name found only extension !!\n%-9s : Default output file name choosed !!\n","[FIX]");
             goto skip;
         }
         if((strcmp(encInfo->src_image_fname,argv[4])==0) || (strcmp(encInfo->secret_fname,argv[4])==0))
         {
-            printf("INVALID : Two file name can't be same !!\nFIX : Default output file name choosed !!\n");
+            printf("[INVALID] : Two file name can't be same !!\n%-9s : Default output file name choosed !!\n","[FIX]");
             goto skip;
         }
         display_status("Validating output file name","Valid output file name");
@@ -63,6 +58,7 @@ Status read_and_validate_encode_args(char *argv[], EncodeInfo *encInfo)
     }
     else
     {
+        display_status("Choosing default file name","Default output file name choosed");
         skip:
         encInfo->stego_image_fname="stego.bmp";
     }
@@ -73,51 +69,59 @@ Status read_and_validate_encode_args(char *argv[], EncodeInfo *encInfo)
 Status do_encoding(EncodeInfo *encInfo)
 {
     open_files(encInfo);
-    display_status("Files are openning","All file successfully opened");
+    display_status("Files are openning","All file opened successfully");
 
     again :
-    printf("Enter the magic string : ");
+    printf("%-9s : Enter the magic string : ","[INPUT]");
     if(fgets(encInfo->magic_string,sizeof(encInfo->magic_string),stdin) != NULL)
     {
         if (strchr(encInfo->magic_string, '\n') == NULL)
         {
             char ch;
-            printf("\nINVALID : Input may be too long!! -Try again\n\n");
+            printf("[INVALID] : Input may be too long !! -Try again\n");
             while ((ch = getchar()) != '\n' && ch != EOF);
+            goto again;
+        }
+        if(encInfo->magic_string[0]=='\n')
+        {
+            printf("[INVALID] : Empty input !! -Try again\n");
             goto again;
         }
         *(strchr(encInfo->magic_string, '\n'))='\0';
     }
     else
     {
-        printf("\nINVALID : Something went wrong , Try again\n\n");
+        printf("[INVALID] : Something went wrong , Try again\n");
         goto again;
     }
-    display_status("Validating magic string","valid magic string");
+    display_status("Validating magic string","Valid magic string");
 
     check_capacity(encInfo);
-    display_status("Checking source file capacity","Valid source file capacity");
+    display_status("Checking source file capacity and bits per pixel","Valid source file capacity and bits per pixel");
 
     copy_bmp_header(encInfo->fptr_src_image, encInfo->fptr_stego_image);
-    display_status("Copiying header bytes to output file","Header bytes susscessfully copied");
+    display_status("Copiying header bytes to output file","Header bytes copied successfully");
 
     encode_magic_string(encInfo);
-    display_status("Encoding magic string","Magic string successfully encoded");
+    display_status("Encoding magic string","Magic string encoded successfully");
 
     encode_secret_file_extn_data(encInfo);
-    display_status("Encoding secret file extension data","Secret file extension length and extension successfully encoded");
+    display_status("Encoding secret file extension data","Secret file extension length and extension encoded successfully");
 
     encode_secret_file_size(encInfo);
-    display_status("Encoding secret file size","Secret file size successfully encoded");
+    display_status("Encoding secret file size","Secret file size encoded successfully");
 
     encode_secret_file_data(encInfo);
-    display_status("Encoding secret file data","Secret file data successfully encoded");
+    display_status("Encoding secret file data","Secret file data encoded successfully");
 
     copy_remaining_img_data(encInfo->fptr_src_image,encInfo->fptr_stego_image,encInfo);
-    display_status("Copying remaining data","Remaining data successfully copied");
+    display_status("Copying remaining data","Remaining data copied successfully");
+
+    close_encfile(encInfo);
+    display_status("Closing all files","All files closed successfully");
 
     printf("\n************************************************\n");
-	printf("        Encoding completed successfully!\n");
+	printf("        Encoding Completed Successfully\n");
 	printf("************************************************\n");
     return e_success;
 
@@ -150,7 +154,7 @@ Status check_capacity(EncodeInfo *encInfo)
     {
         char ch;
         again :
-        printf("\nWARNING : Empthy secret file !!\nDo you want to continue encoding (y/n): ");
+        printf("\nWARNING : Empty secret file !!\nDo you want to continue encoding (y/n): ");
         scanf("%c",&ch);
         if(getchar()!='\n')
         {
@@ -195,6 +199,11 @@ uint get_image_size_for_bmp(FILE *fptr_image,EncodeInfo *encInfo)
     fread(&height,4,1,fptr_image);
     fseek(fptr_image,28,SEEK_SET);
     fread(&(encInfo->bits_per_pixel),2,1,fptr_image);
+    if(encInfo->bits_per_pixel != 24)
+    {
+        display_error("Source file is not RGB(24 bits per pixel) pixel file");
+        exit(e_failure);
+    }
     //printf("width -%u \nheight -%u\nbpp - %d\n",width,height,(encInfo->bits_per_pixel/8));
     return (width * height * (encInfo->bits_per_pixel/8));  //calculating the byte of data the image can hide 1byte data 8byte image data to hide
 }
@@ -301,13 +310,16 @@ Status copy_remaining_img_data(FILE *fptr_src, FILE *fptr_dest,EncodeInfo *encIn
         if(fread(buffer,1,remining_size,fptr_src)!=remining_size)
         {
             display_error("Reading from source file failed");
+            free(buffer);
             exit(e_failure);
         }
         if(fwrite(buffer,1,remining_size,fptr_dest)!=remining_size)
         {
             display_error("Writing to output file failed");
+            free(buffer);
             exit(e_failure);
         }
+        free(buffer);
     }
     else
     {
@@ -332,20 +344,27 @@ Status copy_remaining_img_data(FILE *fptr_src, FILE *fptr_dest,EncodeInfo *encIn
     return e_success;  
 }
 
+void close_encfile(EncodeInfo *encInfo)
+{
+    fclose(encInfo->fptr_src_image);
+    fclose(encInfo->fptr_secret);
+    fclose(encInfo->fptr_stego_image);
+}
+
 void display_status(char *status,char *done)
 {
     for(int i=0;i<=100;i++)
     {
-        printf("STATUS : %s........%d%%\r",status,i);
+        printf("%-9s : %s........%d%%\r","[STATUS]",status,i);
         usleep(10000);
         fflush(stdout);
     }
     printf("\r\033[K");  // Return to beginning and clear the line
-    printf("STATUS : %s\n", done);
+    printf("%-9s : %s\n","[STATUS]",done);
 }
 
 void display_error(char *error)
 {
-    printf("\nERROR : %s !!\n",error);
-    printf("\n***** Encoding FAILED *****\n\n");
+    printf("\n%-9s : %s !!\n","[ERROR]",error);
+    printf("\n**************** Encoding FAILED ****************\n\n");
 }
