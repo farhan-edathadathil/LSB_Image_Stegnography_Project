@@ -20,7 +20,10 @@ int main(int argc,char **argv)
         }
         printf("We choosed Encoding !!\n");
         if(read_and_validate_encode_args(argv,&encInfo)!=e_success)
+        {
+            printf("\nEncoding FAILED !!\n\n");
             return e_failure;
+        }
         do_encoding(&encInfo);
     }
     else if(check_operation_type(argv)==e_decode)
