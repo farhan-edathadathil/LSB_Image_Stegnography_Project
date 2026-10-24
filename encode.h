@@ -89,4 +89,6 @@ Status copy_remaining_img_data(FILE *fptr_src, FILE *fptr_dest,EncodeInfo *encIn
 
 void display_status(char *status,char *done);
 
+void display_error(char *error);
+
 #endif
