@@ -20,15 +20,13 @@ typedef struct _EncodeInfo
     char *src_image_fname;
     FILE *fptr_src_image;
     uint image_capacity;
-    uint bits_per_pixel;
+    short bits_per_pixel;
     unsigned long size_image_file;
-    //char image_data[MAX_IMAGE_BUF_SIZE];
 
     /* Secret File Info */
     char *secret_fname;
     FILE *fptr_secret;
     char *extn_secret_file;
-    //char secret_data[MAX_SECRET_BUF_SIZE];
     long size_secret_file;
 
     /* Stego Image Info */
@@ -58,7 +56,7 @@ Status open_files(EncodeInfo *encInfo);
 Status check_capacity(EncodeInfo *encInfo);
 
 /* Get image size */
-uint get_image_size_for_bmp(FILE *fptr_image);
+uint get_image_size_for_bmp(FILE *fptr_image,EncodeInfo *encInfo);
 
 /* Get file size */
 uint get_file_size(FILE *fptr);

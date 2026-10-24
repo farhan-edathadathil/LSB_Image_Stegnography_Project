@@ -143,7 +143,7 @@ Status open_files(EncodeInfo *encInfo)
 
 Status check_capacity(EncodeInfo *encInfo)
 {
-    encInfo->image_capacity= get_image_size_for_bmp(encInfo->fptr_src_image);
+    encInfo->image_capacity= get_image_size_for_bmp(encInfo->fptr_src_image,encInfo);
 
     encInfo->size_secret_file= get_file_size(encInfo->fptr_secret);
     if(encInfo->size_secret_file==0)
@@ -186,15 +186,17 @@ Status check_capacity(EncodeInfo *encInfo)
     return e_success;
 }
 
-uint get_image_size_for_bmp(FILE *fptr_image)
+uint get_image_size_for_bmp(FILE *fptr_image,EncodeInfo *encInfo)
 {
     unsigned int width,height;
 
     fseek(fptr_image,18,SEEK_SET);
     fread(&width,4,1,fptr_image);
     fread(&height,4,1,fptr_image);
-    //printf("width -%u \nheight -%u\n",width,height);
-    return (width * height * 3);  //calculating the byte of data the image can hide 1byte data 8byte image data to hide
+    fseek(fptr_image,28,SEEK_SET);
+    fread(&(encInfo->bits_per_pixel),2,1,fptr_image);
+    //printf("width -%u \nheight -%u\nbpp - %d\n",width,height,(encInfo->bits_per_pixel/8));
+    return (width * height * (encInfo->bits_per_pixel/8));  //calculating the byte of data the image can hide 1byte data 8byte image data to hide
 }
 
 uint get_file_size(FILE *fptr)
