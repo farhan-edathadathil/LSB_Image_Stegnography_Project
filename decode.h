@@ -9,22 +9,39 @@ typedef struct _DecodeInfo
     char *input_stego_fname;
     FILE *fptr_input_stego;
     short bits_per_pixel;
-    unsigned long size_image_file;
+    unsigned long size_stego_file;
 
     /* Output File Info */
-    char *output_fname;
+    char output_fname[15];
     FILE *fptr_output;
-    char *extn_output_file;
     unsigned long size_secret_file;
 
     //magic string
-    char magic_string[10];
+    char magic_string[4];
+    int magic_len;
 } DecodeInfo;
 
 Status read_and_validate_decode_args(char *argv[], DecodeInfo *decInfo);
 
 Status do_decoding(DecodeInfo *decInfo);
 
+Status open_file_and_checks(DecodeInfo *decInfo);
+
+Status authenticate_magic_str(DecodeInfo *decInfo);
+
+Status decode_extn_data(DecodeInfo *decInfo);
+
+Status create_secret_file(DecodeInfo *decInfo);
+
+Status decode_secret_data_size(DecodeInfo *decInfo);
+
+Status decode_secret_data(DecodeInfo *decInfo);
+
+Status fsize_check(unsigned long cur_data_size,DecodeInfo *decInfo);
+
+Status decode_data_from_image(int size,void *data,DecodeInfo *decInfo);
+
+Status decode_lsb_to_byte(char *data,char *image_buffer);
 
 void close_decfile(DecodeInfo *decInfo);
 

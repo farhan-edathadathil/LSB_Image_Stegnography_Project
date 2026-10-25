@@ -47,7 +47,7 @@ void display_help()
 
     printf("\n  Example:\n");
     printf("    ./a.out -e input.bmp secret.txt output.bmp\n");
-    printf("    ./a.out -e input.bmp secret.c \n");
+    printf("    ./a.out -e input.bmp secret.txt \n");
 
     printf("\nDECODING:\n");
     printf("  Command :\n");
@@ -69,6 +69,7 @@ void display_help()
     printf("\nNOTES:\n");
     printf("  * The source image must be an RGB BMP image with\n");
     printf("    a color depth of 24 bits per pixel (24 bpp).\n");
+    printf("  * The 2 character supported for magic string.\n");
 
 
     printf("\n************************************************************\n\n");
@@ -80,5 +81,5 @@ void display_comerror(char *error)
 {
     printf("\n%-9s : %s !!\n","[ERROR]",error);
     display_help();
-    printf("\n******************* Programm Terminated ********************\n\n");
+    printf("\n************** Programm Terminated **************\n\n");
 }

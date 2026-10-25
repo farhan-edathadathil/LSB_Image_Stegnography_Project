@@ -11,6 +11,11 @@ int main(int argc,char **argv)
         display_comerror("Not enough arguments given");
         return e_failure;
     }
+    if(argc>4)
+    {
+        display_comerror("More number of arguments given");
+        return e_failure;
+    }
     EncodeInfo encInfo;
     DecodeInfo decInfo;
 
@@ -23,7 +28,7 @@ int main(int argc,char **argv)
             return e_failure;
         }
         printf("\n************************************************\n");
-        printf("        Encoding Operation Selected\n");
+        printf("          Encoding Operation Selected\n");
         printf("************************************************\n\n");
 
         if(read_and_validate_encode_args(argv,&encInfo)!=e_success)
@@ -40,7 +45,7 @@ int main(int argc,char **argv)
             return e_failure;
         }
         printf("\n************************************************\n");
-        printf("        Decoding Operation Selected\n");
+        printf("          Decoding Operation Selected\n");
         printf("************************************************\n\n");
         if(read_and_validate_decode_args(argv,&decInfo)!=e_success)
             return e_failure;

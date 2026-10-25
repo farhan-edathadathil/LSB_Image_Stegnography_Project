@@ -73,21 +73,21 @@ Status do_encoding(EncodeInfo *encInfo)
 
     again :
     printf("%-9s : Enter the magic string : ","[INPUT]");
-    if(fgets(encInfo->magic_string,sizeof(encInfo->magic_string),stdin) != NULL)
+    if(fgets(encInfo->magic_string,(sizeof(encInfo->magic_string)),stdin) != NULL)
     {
         if (strchr(encInfo->magic_string, '\n') == NULL)
         {
             char ch;
-            printf("[INVALID] : Input may be too long !! -Try again\n");
+            printf("[INVALID] : Input may be too long, only 2 character is valid !! -Try again\n");
             while ((ch = getchar()) != '\n' && ch != EOF);
             goto again;
         }
-        if(encInfo->magic_string[0]=='\n')
+        *(strchr(encInfo->magic_string, '\n'))='\0';
+        if(strlen(encInfo->magic_string)<2)
         {
-            printf("[INVALID] : Empty input !! -Try again\n");
+            printf("[INVALID] : Empty input or not given 2 character !! -Try again\n");
             goto again;
         }
-        *(strchr(encInfo->magic_string, '\n'))='\0';
     }
     else
     {
@@ -132,14 +132,18 @@ Status open_files(EncodeInfo *encInfo)
     encInfo->fptr_src_image=fopen(encInfo->src_image_fname,"r");
     if(encInfo->fptr_src_image==NULL)
     {
-        printf("\nERROR : %s file not found in PWD !!\n\n",encInfo->src_image_fname);
+        printf("\n%-9s : %s file not found in PWD !!\n\n","[ERROR]",encInfo->src_image_fname);
+        printf("\n**************** Encoding FAILED ****************\n");
+        printf("\n************** Programm Terminated **************\n\n");
         exit(e_failure);
     }
     encInfo->fptr_secret=fopen(encInfo->secret_fname,"r");
     if(encInfo->fptr_secret==NULL)
     {
-        printf("\nERROR : %s file not found in PWD !!\n\n",encInfo->secret_fname);
+        printf("\n%-9s : %s file not found in PWD !!\n\n","[ERROR]",encInfo->secret_fname);
         exit(e_failure);
+        printf("\n**************** Encoding FAILED ****************\n");
+        printf("\n************** Programm Terminated **************\n\n");
     }
     encInfo->fptr_stego_image=fopen(encInfo->stego_image_fname,"w");
     return e_success;
@@ -230,7 +234,7 @@ Status copy_bmp_header(FILE *fptr_src_image, FILE *fptr_dest_image)
 
 Status encode_magic_string(EncodeInfo *encInfo)
 {
-    int size =strlen(encInfo->magic_string)+1;
+    int size =strlen(encInfo->magic_string);
     encode_data_to_image(size,encInfo->magic_string,encInfo);
     return e_success;
 }
@@ -366,5 +370,6 @@ void display_status(char *status,char *done)
 void display_error(char *error)
 {
     printf("\n%-9s : %s !!\n","[ERROR]",error);
-    printf("\n**************** Encoding FAILED ****************\n\n");
+    printf("\n**************** Encoding FAILED ****************\n");
+    printf("\n************** Programm Terminated **************\n\n");
 }
