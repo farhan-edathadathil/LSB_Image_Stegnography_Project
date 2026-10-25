@@ -8,7 +8,12 @@
 
 OperationType check_operation_type(char *argv[]);
 
+/* Get file size */
+uint get_file_size(FILE *fptr);
+
 void display_help();
+
+void display_status(char *status,char *done);
 
 void display_comerror(char *error);
 

@@ -3,6 +3,7 @@
 #include<stdlib.h>
 #include<unistd.h>
 #include"encode.h"
+#include"common.h"
 #include"types.h"
 
 
@@ -212,15 +213,6 @@ uint get_image_size_for_bmp(FILE *fptr_image,EncodeInfo *encInfo)
     return (width * height * (encInfo->bits_per_pixel/8));  //calculating the byte of data the image can hide 1byte data 8byte image data to hide
 }
 
-uint get_file_size(FILE *fptr)
-{
-    unsigned long fsize;
-    fseek(fptr,0,SEEK_END);
-    fsize=ftell(fptr);
-    rewind(fptr);
-    return fsize;
-}
-
 Status copy_bmp_header(FILE *fptr_src_image, FILE *fptr_dest_image)
 {
     char temp[54];
@@ -353,18 +345,6 @@ void close_encfile(EncodeInfo *encInfo)
     fclose(encInfo->fptr_src_image);
     fclose(encInfo->fptr_secret);
     fclose(encInfo->fptr_stego_image);
-}
-
-void display_status(char *status,char *done)
-{
-    for(int i=0;i<=100;i++)
-    {
-        printf("%-9s : %s........%d%%\r","[STATUS]",status,i);
-        usleep(10000);
-        fflush(stdout);
-    }
-    printf("\r\033[K");  // Return to beginning and clear the line
-    printf("%-9s : %s\n","[STATUS]",done);
 }
 
 void display_error(char *error)

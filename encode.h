@@ -58,9 +58,6 @@ Status check_capacity(EncodeInfo *encInfo);
 /* Get image size */
 uint get_image_size_for_bmp(FILE *fptr_image,EncodeInfo *encInfo);
 
-/* Get file size */
-uint get_file_size(FILE *fptr);
-
 /* Copy bmp image header */
 Status copy_bmp_header(FILE *fptr_src_image, FILE *fptr_dest_image);
 
@@ -86,8 +83,6 @@ Status encode_byte_to_lsb(const unsigned char data, char *image_buffer);
 Status copy_remaining_img_data(FILE *fptr_src, FILE *fptr_dest,EncodeInfo *encInfo);
 
 void close_encfile(EncodeInfo *encInfo);
-
-void display_status(char *status,char *done);
 
 void display_error(char *error);
 

@@ -1,6 +1,7 @@
 #include<stdio.h>
 #include"common.h"
 #include"types.h"
+#include<unistd.h>
 #include<string.h>
 
 OperationType check_operation_type(char *argv[])
@@ -12,6 +13,15 @@ OperationType check_operation_type(char *argv[])
         return e_decode;
     else
         return e_unsupported;
+}
+
+uint get_file_size(FILE *fptr)
+{
+    unsigned long fsize;
+    fseek(fptr,0,SEEK_END);
+    fsize=ftell(fptr);
+    rewind(fptr);
+    return fsize;
 }
 
 void display_help()
@@ -73,8 +83,18 @@ void display_help()
 
 
     printf("\n************************************************************\n\n");
-   
+}
 
+void display_status(char *status,char *done)
+{
+    for(int i=0;i<=100;i++)
+    {
+        printf("%-9s : %s........%d%%\r","[STATUS]",status,i);
+        usleep(10000);
+        fflush(stdout);
+    }
+    printf("\r\033[K");  // Return to beginning and clear the line
+    printf("%-9s : %s\n","[STATUS]",done);
 }
 
 void display_comerror(char *error)

@@ -3,6 +3,7 @@
 #include<stdlib.h>
 #include "decode.h"
 #include "encode.h"
+#include"common.h"
 #include "types.h"
 
 Status read_and_validate_decode_args(char *argv[], DecodeInfo *decInfo)
