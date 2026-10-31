@@ -1,15 +1,35 @@
+/*
+============================================================================
+
+                       COMMON.H
+
+ DESCRIPTION:
+
+ This header file contains the function declarations for common
+ operations used throughout the project.
+
+ It includes functions for identifying the selected operation,
+ calculating file size, displaying application help, showing
+ execution progress and displaying common error messages.
+
+ It includes types.h to access the user-defined data types.
+
+ These functions provide common functionality that can be accessed
+ by the main, encoding and decoding modules.
+
+============================================================================
+*/
+
 #ifndef COMMON_H
 #define COMMON_H
 
 #include"types.h"
 
-/* Magic string to identify whether stegged or not */
-#define MAGIC_STRING "#*"  //read from user
 
 OperationType check_operation_type(char *argv[]);
 
 /* Get file size */
-uint get_file_size(FILE *fptr);
+unsigned long get_file_size(FILE *fptr);
 
 void display_help();
 

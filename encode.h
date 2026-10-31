@@ -1,25 +1,43 @@
+/*
+============================================================================
+
+                       ENCODE.H
+
+ DESCRIPTION:
+
+ This header file contains the EncodeInfo structure, macro definitions
+ and function declarations required for the encoding operation.
+
+ The EncodeInfo structure stores the source image information,
+ secret file information, destination stego image information,
+ file pointers, image capacity, file sizes and magic string.
+
+ It also defines macros for secret data buffer size, image buffer size
+ and maximum file extension length.
+
+ The function declarations cover the complete encoding process,
+ including argument validation, file opening, image capacity checking,
+ BMP header copying, magic string encoding, secret file extension
+ encoding, secret file size encoding, secret file data encoding
+ and copying the remaining image data.
+
+ These declarations allow the encoding functionality to be implemented
+ separately in encode.c and accessed by other project modules.
+
+============================================================================
+*/
+
 #ifndef ENCODE_H
 #define ENCODE_H
 
 #include "types.h" // Contains user defined types
-
-/* 
- * Structure to store information required for
- * encoding secret file to source Image
- * Info about output and intermediate data is
- * also stored
- */
-
-#define MAX_SECRET_BUF_SIZE 1
-#define MAX_IMAGE_BUF_SIZE (MAX_SECRET_BUF_SIZE * 8)
-#define MAX_FILE_SUFFIX 4
 
 typedef struct _EncodeInfo
 {
     /* Source Image info */
     char *src_image_fname;
     FILE *fptr_src_image;
-    uint image_capacity;
+    unsigned long image_capacity;
     short bits_per_pixel;
     unsigned long size_image_file;
 
@@ -27,7 +45,7 @@ typedef struct _EncodeInfo
     char *secret_fname;
     FILE *fptr_secret;
     char *extn_secret_file;
-    long size_secret_file;
+    unsigned long size_secret_file;
 
     /* Stego Image Info */
     char *stego_image_fname;
@@ -56,7 +74,7 @@ Status open_files(EncodeInfo *encInfo);
 Status check_capacity(EncodeInfo *encInfo);
 
 /* Get image size */
-uint get_image_size_for_bmp(FILE *fptr_image,EncodeInfo *encInfo);
+unsigned long get_image_size_for_bmp(FILE *fptr_image,EncodeInfo *encInfo);
 
 /* Copy bmp image header */
 Status copy_bmp_header(FILE *fptr_src_image, FILE *fptr_dest_image);
@@ -84,6 +102,7 @@ Status copy_remaining_img_data(FILE *fptr_src, FILE *fptr_dest,EncodeInfo *encIn
 
 void close_encfile(EncodeInfo *encInfo);
 
+/* display encoding error */
 void display_error(char *error);
 
 #endif

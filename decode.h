@@ -1,3 +1,32 @@
+/*
+============================================================================
+
+                       DECODE.H
+
+ DESCRIPTION:
+
+ This header file contains the DecodeInfo structure and function
+ declarations required for the decoding operation.
+
+ The DecodeInfo structure stores the input stego image information,
+ output file information, file pointers, image properties, secret
+ file size and magic string details.
+
+ The function declarations cover the complete decoding process,
+ including argument validation, input image checking, magic string
+ authentication, secret file extension extraction, output file
+ creation, secret file size extraction and secret file data extraction.
+
+ It also declares functions for extracting individual bytes from
+ image LSBs, checking available image data, closing files and
+ displaying decoding errors.
+
+ These declarations allow the decoding functionality to be implemented
+ separately in decode.c and accessed by other project modules.
+
+============================================================================
+*/
+
 #ifndef DECODE_H
 #define DECODE_H
 
@@ -12,7 +41,7 @@ typedef struct _DecodeInfo
     unsigned long size_stego_file;
 
     /* Output File Info */
-    char output_fname[15];
+    char output_fname[256];
     FILE *fptr_output;
     unsigned long size_secret_file;
 

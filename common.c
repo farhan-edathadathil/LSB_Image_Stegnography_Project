@@ -6,6 +6,32 @@
 
 OperationType check_operation_type(char *argv[])
 {
+    /*
+    ============================================================================
+    Function    : check_operation_type
+    Description : Identifies whether the user has selected encoding,
+                decoding or an unsupported operation.
+
+    Logic       :
+                1. Compares argv[1] with "-e".
+                2. If it matches, returns e_encode.
+                3. Otherwise, compares argv[1] with "-d".
+                4. If it matches, returns e_decode.
+                5. If neither option matches, returns e_unsupported.
+
+    Benefit     : Identifies the requested operation and allows the main
+                function to execute the appropriate functionality.
+
+    Parameters  :
+                argv - Array containing command-line arguments.
+                        argv[1] contains the operation option.
+
+    Return      : OperationType
+                e_encode      - Encoding operation selected.
+                e_decode      - Decoding operation selected.
+                e_unsupported - Invalid operation selected.
+    ============================================================================
+    */
 
     if(strcmp(argv[1],"-e")==0)
         return e_encode;
@@ -15,8 +41,34 @@ OperationType check_operation_type(char *argv[])
         return e_unsupported;
 }
 
-uint get_file_size(FILE *fptr)
+unsigned long get_file_size(FILE *fptr)
 {
+   /*
+    ============================================================================
+    Function    : get_file_size
+    Description : Calculates and returns the size of a given file in bytes.
+
+    Logic       :
+                1. Moves the file pointer to the end of the file using
+                    fseek().
+                2. Uses ftell() to obtain the current file position,
+                    which represents the file size.
+                3. Stores the file size in the fsize variable.
+                4. Calls rewind() to move the file pointer back to
+                    the beginning of the file.
+                5. Returns the calculated file size.
+
+    Benefit     : Provides the file size required for checking image
+                capacity, secret file size and input file validity.
+
+    Parameters  :
+                fptr - File pointer of the file whose size is calculated.
+
+    Return      : uint
+                Returns the size of the file in bytes.
+    ============================================================================
+    */
+   
     unsigned long fsize;
     fseek(fptr,0,SEEK_END);
     fsize=ftell(fptr);
@@ -26,6 +78,22 @@ uint get_file_size(FILE *fptr)
 
 void display_help()
 {
+    /*
+    ============================================================================
+    Function    : display_help
+    Description : Displays the user manual containing application
+                description, command-line syntax and usage instructions.
+
+    Benefit     : Helps users understand the available operations,
+                command-line arguments and application requirements.
+
+    Parameters  :
+                No parameters.
+
+    Return      : void
+                Does not return any value.
+    ============================================================================
+    */
     printf("\n");
     printf("************************************************************\n");
     printf("              LSB IMAGE STEGANOGRAPHY\n");
@@ -87,6 +155,33 @@ void display_help()
 
 void display_status(char *status,char *done)
 {
+    /*
+    ============================================================================
+    Function    : display_status
+    Description : Displays the execution progress of an operation and
+                prints its completion message.
+
+    Logic       :
+                1. Executes a loop from 0 to 100.
+                2. Displays the current operation status with a
+                    percentage value.
+                3. Uses usleep() to introduce a small delay between
+                    percentage updates.
+                4. Calls fflush() to immediately display the output.
+                5. Clears the progress line after reaching 100%.
+                6. Displays the final completion message.
+
+    Benefit     : Provides visual feedback to the user about the
+                progress and completion of different operations.
+
+    Parameters  :
+                status - Description of the operation currently running.
+                done   - Message displayed after operation completion.
+
+    Return      : void
+                Does not return any value.
+    ============================================================================
+    */
     for(int i=0;i<=100;i++)
     {
         printf("%-9s : %s........%d%%\r","[STATUS]",status,i);
@@ -99,6 +194,28 @@ void display_status(char *status,char *done)
 
 void display_comerror(char *error)
 {
+    /*
+    ============================================================================
+    Function    : display_comerror
+    Description : Displays a common application error message followed
+                by the user manual and program termination message.
+
+    Logic       :
+                1. Prints the supplied error message.
+                2. Calls display_help() to display application usage
+                    instructions.
+                3. Displays the program termination message.
+
+    Benefit     : Provides a common error-handling mechanism for
+                command-line argument and operation-related errors.
+
+    Parameters  :
+                error - String containing the error description.
+
+    Return      : void
+                Does not return any value.
+    ============================================================================
+    */
     printf("\n%-9s : %s !!\n","[ERROR]",error);
     display_help();
     printf("\n************** Programm Terminated **************\n\n");
